@@ -19,6 +19,7 @@ private:
 	SDL_Texture *sprites;
 	void CleanExit(int);
 	SDL_Renderer *renderer;
+	int direction;
 public:
 	SDL_Texture * getSpriteSheet();
 	void renderSprite(SDL_Rect destinationRect);
@@ -26,5 +27,7 @@ public:
 	SDL_Rect updateAnimation();
 	void newRenderer(SDL_Renderer *ren);
 	void updateLocation();
+	void changeDirection(int newDirection);
+	int getDirection();
 };
 

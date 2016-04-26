@@ -14,8 +14,6 @@ SDL_Rect message_rect; //SDL_rect for the message
 Spritesheet pacman("pacman", 2, 150);
 Spritesheet ghostRed("ghostred", 2, 250);
 
-Spritesheet SpriteArray [] = { pacman, ghostRed };
-
 bool done = false;
 
 void handleInput()
@@ -53,6 +51,26 @@ void handleInput()
 				{
 					//hit escape to exit
 					case SDLK_ESCAPE: done = true;
+					case SDLK_UP: 
+					{
+						pacman.changeDirection(2);
+						break;
+					}
+					case SDLK_DOWN: 
+					{
+						pacman.changeDirection(3);
+						break;
+					}
+					case SDLK_RIGHT: 
+					{
+						pacman.changeDirection(0);
+						break;
+					}
+					case SDLK_LEFT: 
+					{
+						pacman.changeDirection(1);
+						break;
+					}
 				}
 			break;
 		}
@@ -63,7 +81,8 @@ void handleInput()
 // tag::updateSimulation[]
 void updateSimulation(double simLength = 0.02) //update simulation with an amount of time to simulate for (in seconds)
 {
-  //CHANGE ME
+	//move pacman
+	pacman.updateLocation();
 }
 
 void render()
@@ -74,8 +93,8 @@ void render()
 		//Draw the texture
 		SDL_RenderCopy(ren, tex, NULL, NULL);
 
-		//Draw the text
-		
+		//Draw the sprites
+		pacman.renderSprite();
 		ghostRed.renderSprite();
 
 		//Update the screen
