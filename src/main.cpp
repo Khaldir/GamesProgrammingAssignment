@@ -1,19 +1,6 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <string>
+#include "includes.h"
+#include "Spritesheet.h"
 
-
-#ifdef _WIN32 // compiling on windows
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-
-#else // NOT compiling on windows
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#endif
 
 std::string exeName;
 SDL_Window *win; //pointer to the SDL_Window
@@ -23,6 +10,11 @@ SDL_Texture *tex; //pointer to the SDL_Texture
 SDL_Surface *messageSurface; //pointer to the SDL_Surface for message
 SDL_Texture *messageTexture; //pointer to the SDL_Texture for message
 SDL_Rect message_rect; //SDL_rect for the message
+
+Spritesheet pacman("pacman", 2, 150);
+Spritesheet ghostRed("ghostred", 2, 250);
+
+Spritesheet SpriteArray [] = { pacman, ghostRed };
 
 bool done = false;
 
@@ -83,7 +75,8 @@ void render()
 		SDL_RenderCopy(ren, tex, NULL, NULL);
 
 		//Draw the text
-		SDL_RenderCopy(ren, messageTexture, NULL, &message_rect);
+		
+		ghostRed.renderSprite();
 
 		//Update the screen
 		SDL_RenderPresent(ren);
@@ -98,6 +91,7 @@ void cleanExit(int returnValue)
 	SDL_Quit();
 	exit(returnValue);
 }
+
 
 // based on http://www.willusher.io/sdl2%20tutorials/2013/08/17/lesson-1-hello-world/
 int main( int argc, char* args[] )
@@ -127,7 +121,7 @@ int main( int argc, char* args[] )
 		cleanExit(1);
 	}
 
-	std::string imagePath = "./assets/Opengl-logo.svg.png";
+	std::string imagePath = "./assets/background.png";
 	surface = IMG_Load(imagePath.c_str());
 	if (surface == nullptr){
 		std::cout << "SDL IMG_Load Error: " << SDL_GetError() << std::endl;
@@ -161,6 +155,9 @@ int main( int argc, char* args[] )
 	message_rect.y = 0;
 	message_rect.w = 300;
 	message_rect.h = 100;
+
+	pacman.newRenderer(ren);
+	ghostRed.newRenderer(ren);
 
 	while (!done) //loop until done flag is set)
 	{
