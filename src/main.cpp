@@ -1,6 +1,22 @@
 #include "includes.h"
 #include "Spritesheet.h"
 
+void sources()
+{
+	std::cout << "Sources" << std::endl;
+	std::cout << "-------" << std::endl;
+	std::cout << "The following sources were used to aid the programming of this game" << std::endl;
+	std::cout << "No code was taken directly from any of these sites" << std::endl;
+	std::cout << "==============================================================================" << std::endl;
+
+	std::cout << "Collisions: " << std::endl; 
+	std::cout << "http://headerphile.blogspot.co.uk/2014/04/part-5-game-programming-in-sdl2.html" << std::endl;
+	std::cout << "Sprites: " << std::endl; 
+	std::cout << "http://kafumble.blogspot.co.uk/2011/05/pacman.html" << std::endl;
+
+	std::cout << "==============================================================================" << std::endl;
+
+}
 
 std::string exeName;
 SDL_Window *win; //pointer to the SDL_Window
@@ -15,6 +31,57 @@ Spritesheet pacman("pacman", 2, 150);
 Spritesheet ghostRed("ghostred", 2, 250);
 
 bool done = false;
+
+SDL_Rect voidzone[40];
+
+SDL_Rect fillRect(int x, int y, int w, int h)
+{
+	SDL_Rect tempRect;
+	tempRect.x = x;
+	tempRect.y = y;
+	tempRect.w = w;
+	tempRect.h = h;
+	return tempRect;
+}
+
+void mirrorFill(int count, int x, int y, int w, int h)
+{
+	voidzone[count] = fillRect(x, y, w, h);
+	voidzone[count + 1] = fillRect(463 - (x + w), y, w, h);
+}
+
+void initialiseVoidZones()
+{
+	mirrorFill(0, 45, 45, 56, 56);
+	mirrorFill(2, 135, 45, 57, 56);
+	mirrorFill(4, 45, 135, 56, 34);
+	mirrorFill(6, 135, 430, 54, 11);
+	voidzone[8] = fillRect(226, 11, 11, 90);
+	voidzone[9] = fillRect(0, 0, 464, 11);
+	mirrorFill(10, 0, 11, 11, 272);
+	mirrorFill(12, 11, 203, 90, 80);
+	mirrorFill(14, 135, 135, 12, 148);
+	mirrorFill(16, 147, 203, 42, 12);
+	mirrorFill(18, 135, 316, 12, 80);
+	voidzone[20] = fillRect(181, 135, 101, 34);
+	voidzone[21] = fillRect(226, 169, 11, 46);
+	voidzone[22] = fillRect(0, 588, 464, 12);
+	voidzone[23] = fillRect(226, 509, 11, 45);
+	voidzone[24] = fillRect(181, 475, 101, 34);
+	voidzone[25] = fillRect(226, 396, 11, 45);
+	voidzone[26] = fillRect(181, 362, 101, 34);
+	mirrorFill(27, 0, 316, 11, 272);
+	mirrorFill(29, 11, 316, 90, 80);
+	mirrorFill(31, 11, 475, 45, 34);
+	mirrorFill(33, 48, 430, 53, 11);
+	mirrorFill(35, 90, 441, 11, 68);
+	mirrorFill(37, 135, 475, 12, 68);
+	mirrorFill(39, 48, 543, 141, 11);
+
+
+
+
+}
 
 void handleInput()
 {
@@ -97,8 +164,17 @@ void render()
 		pacman.renderSprite();
 		ghostRed.renderSprite();
 
+		//Debug - show Out of Bounds Area
+		/*
+		for (int i = 0; i < 41; i++)
+		{
+			SDL_Rect plainGhostColour = fillRect(5, 0, 1, 1);
+			SDL_RenderCopy(ren, ghostRed.getSpriteSheet(), &plainGhostColour, &voidzone[i]);
+		}
+
 		//Update the screen
 		SDL_RenderPresent(ren);
+		*/
 }
 
 void cleanExit(int returnValue)
@@ -115,6 +191,8 @@ void cleanExit(int returnValue)
 // based on http://www.willusher.io/sdl2%20tutorials/2013/08/17/lesson-1-hello-world/
 int main( int argc, char* args[] )
 {
+	initialiseVoidZones();
+	sources();
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
 		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
@@ -123,7 +201,7 @@ int main( int argc, char* args[] )
 	std::cout << "SDL initialised OK!\n";
 
 	//create window
-	win = SDL_CreateWindow("SDL Hello World!", 100, 100, 600, 600, SDL_WINDOW_SHOWN);
+	win = SDL_CreateWindow("SDL Hello World!", 100, 100, 464, 600, SDL_WINDOW_SHOWN);
 
 	//error handling
 	if (win == nullptr)
@@ -175,6 +253,7 @@ int main( int argc, char* args[] )
 	message_rect.w = 300;
 	message_rect.h = 100;
 
+	//Now the renderer is made, add it to the sprites
 	pacman.newRenderer(ren);
 	ghostRed.newRenderer(ren);
 
@@ -192,3 +271,5 @@ int main( int argc, char* args[] )
 	cleanExit(0);
 	return 0;
 }
+
+
