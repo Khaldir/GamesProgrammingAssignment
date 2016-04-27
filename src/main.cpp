@@ -33,6 +33,7 @@ Spritesheet pacman("pacman", 2, 150);
 Spritesheet ghostRed("ghostred", 2, 250);
 
 bool done = false;
+bool dead = false;
 
 SDL_Rect voidzone[42];
 
@@ -106,7 +107,7 @@ bool CheckCollisions(Spritesheet entity, bool pacman)
 		vTop = voidzone[i].y;
 		vBottom = voidzone[i].y + voidzone[i].h;
 
-		if (eLeft<vRight && eRight>vLeft && eBottom>vTop && eTop<vBottom)	//Inside on x
+		if (eLeft<vRight && eRight>vLeft && eBottom>vTop && eTop<vBottom)	
 		{
 			return true;
 		}
@@ -120,11 +121,37 @@ bool CheckCollisions(Spritesheet entity, bool pacman)
 		vTop = voidzone[41].y;
 		vBottom = voidzone[41].y + voidzone[41].h;
 
-		if (eLeft<vRight && eRight>vLeft && eBottom>vTop && eTop<vBottom)	//Inside on x
+		if (eLeft<vRight && eRight>vLeft && eBottom>vTop && eTop<vBottom)	
 		{
 			return true;
 		}
 	}
+	//Checked all void zones, no collision
+	return false;
+}
+
+bool CheckCollisions(Spritesheet firstEntity, Spritesheet secondEntity)
+{
+	SDL_Rect rect = firstEntity.getLocation();
+	int eLeft = rect.x;
+	int eRight = rect.x + rect.w;
+	int eTop = rect.y;
+	int eBottom = rect.y + rect.h;
+	int overlaps = 0;
+
+	rect = secondEntity.getLocation();
+
+	int vLeft = rect.x;
+	int vRight = rect.x + rect.w;
+	int vTop = rect.y;
+	int vBottom = rect.y + rect.h;
+
+	if (eLeft<vRight && eRight>vLeft && eBottom>vTop && eTop<vBottom)	
+	{
+		return true;
+	}
+	
+	
 	//Checked all void zones, no collision
 	return false;
 }
@@ -200,6 +227,12 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 	if (Collided)
 	{
 		pacman.reverseMove();
+	}
+	Collided = CheckCollisions(pacman, ghostRed);
+	if (Collided && !dead)
+	{
+		dead = true;
+		pacman.die(ren);
 	}
 }
 
@@ -312,6 +345,10 @@ int main( int argc, char* args[] )
 	//Now the renderer is made, add it to the sprites
 	pacman.newRenderer(ren);
 	ghostRed.newRenderer(ren);
+
+	//Set the starting locations for the sprites
+	pacman.setLocation(220, 333);
+	ghostRed.setLocation(219, 106);
 
 	while (!done) //loop until done flag is set)
 	{

@@ -20,6 +20,8 @@ private:
 	void CleanExit(int);
 	SDL_Renderer *renderer;
 	int direction;
+	bool dead = false;
+	Uint32 deathTime;
 public:
 	SDL_Texture * getSpriteSheet();
 	void renderSprite(SDL_Rect destinationRect);
@@ -31,5 +33,7 @@ public:
 	int getDirection();
 	void reverseMove();
 	SDL_Rect getLocation();
+	void setLocation(int x, int y);
+	void die(SDL_Renderer *ren);
 };
 
