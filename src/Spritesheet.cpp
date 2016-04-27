@@ -79,6 +79,41 @@ SDL_Rect Spritesheet::updateAnimation()
 	
 }
 
+SDL_Rect Spritesheet::updateAnimation(int num)
+{
+	SDL_Rect output;
+	Uint32 ticks = SDL_GetTicks();
+	Uint32 seconds = ticks / spriteSpeed;
+	Uint32 sprite = seconds % spriteCount;
+	if (location.x < 0)
+	{
+		int covered = -location.x;
+		if (num = 0)
+		{
+			output = { covered + ((int)sprite * widthOfSprite), direction * widthOfSprite, widthOfSprite - covered, widthOfSprite };
+		}
+		else
+		{
+			output = { ((int)sprite * widthOfSprite), direction * widthOfSprite, widthOfSprite - covered, widthOfSprite };
+		}
+	}
+	else
+	{
+		int covered = location.x - 464;
+		if (num = 0)
+		{
+			output = { (int)sprite * widthOfSprite, direction * widthOfSprite, widthOfSprite - covered, widthOfSprite };
+		}
+		else
+		{
+			output = { covered + ((int)sprite * widthOfSprite), direction * widthOfSprite, widthOfSprite - covered, widthOfSprite };
+		}
+	}
+	
+	return output;
+
+}
+
 void Spritesheet::renderSprite(SDL_Rect destinationRect)
 {
 	SDL_Rect srcRect = updateAnimation();
@@ -87,8 +122,35 @@ void Spritesheet::renderSprite(SDL_Rect destinationRect)
 
 void Spritesheet::renderSprite()
 {
-	SDL_Rect srcRect = updateAnimation();
-	SDL_RenderCopy(renderer, sprites, &srcRect, &location);
+	if (location.x < 0 || location.x >(464 - widthOfSprite))
+	{
+		SDL_Rect srcRect = updateAnimation(0);
+		SDL_RenderCopy(renderer, sprites, &srcRect, &location);
+		SDL_Rect oppositeLocation = location;
+		if (location.x < 0)
+		{
+			oppositeLocation.x = 464 - widthOfSprite;
+		}
+		else
+		{
+			oppositeLocation.x = 0;
+		}
+		srcRect = updateAnimation(1);
+		SDL_RenderCopy(renderer, sprites, &srcRect, &oppositeLocation);
+		if (location.x < -(widthOfSprite / 2))
+		{
+			location.x += 464;
+		}
+		if (location.x > 464 + (widthOfSprite / 2))
+		{
+			location.x = 0 - (widthOfSprite / 2);
+		}
+	}
+	else
+	{
+		SDL_Rect srcRect = updateAnimation();
+		SDL_RenderCopy(renderer, sprites, &srcRect, &location);
+	}
 }
 
 void Spritesheet::newRenderer(SDL_Renderer *ren)

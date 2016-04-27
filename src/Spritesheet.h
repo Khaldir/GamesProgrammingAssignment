@@ -20,6 +20,7 @@ private:
 	void CleanExit(int);
 	SDL_Renderer *renderer;
 	int direction;
+	int prevDirection;
 	bool dead = false;
 	Uint32 deathTime;
 public:
@@ -27,6 +28,7 @@ public:
 	void renderSprite(SDL_Rect destinationRect);
 	void renderSprite();
 	SDL_Rect updateAnimation();
+	SDL_Rect updateAnimation(int num);
 	void newRenderer(SDL_Renderer *ren);
 	void updateLocation();
 	void changeDirection(int newDirection);

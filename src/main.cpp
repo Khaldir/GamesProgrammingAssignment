@@ -27,7 +27,7 @@ SDL_Surface *messageSurface; //pointer to the SDL_Surface for message
 SDL_Texture *messageTexture; //pointer to the SDL_Texture for message
 SDL_Rect message_rect; //SDL_rect for the message
 
-bool Debug = false;
+bool Debug = true;
 
 Spritesheet pacman("pacman", 2, 150);
 Spritesheet ghostRed("ghostred", 2, 250);
@@ -55,32 +55,32 @@ void mirrorFill(int count, int x, int y, int w, int h)
 
 void initialiseVoidZones()
 {
-	mirrorFill(0, 45, 45, 56, 56);
-	mirrorFill(2, 135, 45, 57, 56);
-	mirrorFill(4, 45, 135, 56, 34);
-	mirrorFill(6, 135, 430, 54, 11);
-	voidzone[8] = fillRect(226, 11, 11, 90);
-	voidzone[9] = fillRect(0, 0, 464, 11);
-	mirrorFill(10, 0, 11, 11, 272);
-	mirrorFill(12, 11, 203, 90, 80);
-	mirrorFill(14, 135, 135, 12, 148);
-	mirrorFill(16, 147, 203, 42, 12);
-	mirrorFill(18, 135, 316, 12, 80);
-	voidzone[20] = fillRect(181, 135, 101, 34);
-	voidzone[21] = fillRect(226, 169, 11, 46);
-	voidzone[22] = fillRect(0, 588, 464, 12);
-	voidzone[23] = fillRect(226, 509, 11, 45);
-	voidzone[24] = fillRect(181, 475, 101, 34);
-	voidzone[25] = fillRect(226, 396, 11, 45);
-	voidzone[26] = fillRect(181, 362, 101, 34);
-	mirrorFill(27, 0, 316, 11, 272);
-	mirrorFill(29, 11, 316, 90, 80);
-	mirrorFill(31, 11, 475, 45, 34);
-	mirrorFill(33, 48, 430, 53, 11);
-	mirrorFill(35, 90, 441, 11, 68);
-	mirrorFill(37, 135, 475, 12, 68);
-	mirrorFill(39, 48, 543, 141, 11);
-	voidzone[41] = fillRect(181, 249, 101, 79);
+	mirrorFill(0, 41, 48, 50, 40);
+	mirrorFill(2, 123, 48, 68, 40);
+	mirrorFill(4, 41, 126, 50, 20);
+	mirrorFill(6, 123, 416, 68, 20);
+	voidzone[8] = fillRect(222, 10, 18, 79);
+	voidzone[9] = fillRect(0, 0, 464, 10);
+	mirrorFill(10, 0, 10, 9, 252);
+	mirrorFill(12, 9, 184, 82, 78);
+	mirrorFill(14, 123, 126, 18, 136);
+	mirrorFill(16, 141, 184, 50, 20);
+	mirrorFill(18, 123, 300, 18, 78);
+	voidzone[20] = fillRect(173, 126, 117, 20);
+	voidzone[21] = fillRect(223, 146, 17, 58);		
+	voidzone[22] = fillRect(0, 591, 464, 9);		
+	voidzone[23] = fillRect(223, 494, 17, 58);		
+	voidzone[24] = fillRect(173, 474, 117, 20);		
+	voidzone[25] = fillRect(223, 378, 17, 58);		
+	voidzone[26] = fillRect(173, 358, 117, 20);		
+	mirrorFill(27, 0, 300, 9, 291);					
+	mirrorFill(29, 9, 300, 82, 78);					
+	mirrorFill(31, 9, 474, 33, 20);					
+	mirrorFill(33, 41, 416, 50, 20);
+	mirrorFill(35, 74, 436, 17, 58);
+	mirrorFill(37, 123, 474, 18, 58);				
+	mirrorFill(39, 41, 532, 150, 20);				
+	voidzone[41] = fillRect(173, 242, 117, 78);
 
 }
 
@@ -130,6 +130,37 @@ bool CheckCollisions(Spritesheet entity, bool pacman)
 	return false;
 }
 
+bool CheckCollisions(SDL_Rect eRect)
+{
+	int eLeft = eRect.x;
+	int eRight = eRect.x + eRect.w;
+	int eTop = eRect.y;
+	int eBottom = eRect.y + eRect.h;
+	int overlaps = 0;
+
+	int vLeft;
+	int vRight;
+	int vTop;
+	int vBottom;
+
+	for (int i = 0; i < 42; i++)
+	{
+		overlaps = 0;
+		// CoOrdinates of entity corners
+		vLeft = voidzone[i].x;
+		vRight = voidzone[i].x + voidzone[i].w;
+		vTop = voidzone[i].y;
+		vBottom = voidzone[i].y + voidzone[i].h;
+
+		if (eLeft<vRight && eRight>vLeft && eBottom>vTop && eTop<vBottom)
+		{
+			return true;
+		}
+	}
+	//Checked all void zones, no collision
+	return false;
+}
+
 bool CheckCollisions(Spritesheet firstEntity, Spritesheet secondEntity)
 {
 	SDL_Rect rect = firstEntity.getLocation();
@@ -169,6 +200,7 @@ void handleInput()
 	//  - the alternative is to Poll the current state with SDL_GetKeyboardState
 
 	SDL_Event event; //somewhere to store an event
+	SDL_Rect playerLocation;
 
 	//NOTE: there may be multiple events per frame
 	while (SDL_PollEvent(&event)) //loop until SDL_PollEvent returns 0 (meaning no more events)
@@ -186,32 +218,47 @@ void handleInput()
 			//  - the repeat flag is set on the keyboard event, if this is a repeat event
 			//  - in our case, we're going to ignore repeat events
 			//  - https://wiki.libsdl.org/SDL_KeyboardEvent
-			if (!event.key.repeat)
-				switch (event.key.keysym.sym)
+			switch (event.key.keysym.sym)
+			{
+				//hit escape to exit
+				case SDLK_ESCAPE: done = true;
+				case SDLK_UP: 
 				{
-					//hit escape to exit
-					case SDLK_ESCAPE: done = true;
-					case SDLK_UP: 
-					{
+					playerLocation = pacman.getLocation();
+					playerLocation.y -= 5;
+					bool collide = CheckCollisions(playerLocation);
+					if (!collide)
 						pacman.changeDirection(2);
-						break;
-					}
-					case SDLK_DOWN: 
-					{
-						pacman.changeDirection(3);
-						break;
-					}
-					case SDLK_RIGHT: 
-					{
-						pacman.changeDirection(0);
-						break;
-					}
-					case SDLK_LEFT: 
-					{
-						pacman.changeDirection(1);
-						break;
-					}
+					break;
 				}
+				case SDLK_DOWN: 
+				{
+					playerLocation = pacman.getLocation();
+					playerLocation.y += 5;
+					bool collide = CheckCollisions(playerLocation);
+					if (!collide)
+						pacman.changeDirection(3);
+					break;
+				}
+				case SDLK_RIGHT: 
+				{
+					playerLocation = pacman.getLocation();
+					playerLocation.x += 5;
+					bool collide = CheckCollisions(playerLocation);
+					if (!collide)
+						pacman.changeDirection(0);
+					break;
+				}
+				case SDLK_LEFT: 
+				{
+					playerLocation = pacman.getLocation();
+					playerLocation.x -= 5;
+					bool collide = CheckCollisions(playerLocation);
+					if (!collide)
+						pacman.changeDirection(1);
+					break;
+				}
+			}
 			break;
 		}
 	}
@@ -258,7 +305,6 @@ void render()
 				SDL_Rect plainGhostColour = fillRect(5, 0, 1, 1);
 				SDL_RenderCopy(ren, ghostRed.getSpriteSheet(), &plainGhostColour, &voidzone[i]);
 			}
-			done = true;
 		}
 
 		//Update the screen
@@ -347,7 +393,7 @@ int main( int argc, char* args[] )
 	ghostRed.newRenderer(ren);
 
 	//Set the starting locations for the sprites
-	pacman.setLocation(220, 333);
+	pacman.setLocation(219, 325);
 	ghostRed.setLocation(219, 106);
 
 	while (!done) //loop until done flag is set)
