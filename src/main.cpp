@@ -27,12 +27,14 @@ SDL_Surface *messageSurface; //pointer to the SDL_Surface for message
 SDL_Texture *messageTexture; //pointer to the SDL_Texture for message
 SDL_Rect message_rect; //SDL_rect for the message
 
+bool Debug = false;
+
 Spritesheet pacman("pacman", 2, 150);
 Spritesheet ghostRed("ghostred", 2, 250);
 
 bool done = false;
 
-SDL_Rect voidzone[40];
+SDL_Rect voidzone[42];
 
 SDL_Rect fillRect(int x, int y, int w, int h)
 {
@@ -77,10 +79,54 @@ void initialiseVoidZones()
 	mirrorFill(35, 90, 441, 11, 68);
 	mirrorFill(37, 135, 475, 12, 68);
 	mirrorFill(39, 48, 543, 141, 11);
+	voidzone[41] = fillRect(181, 249, 101, 79);
 
+}
 
+bool CheckCollisions(Spritesheet entity, bool pacman)
+{
+	SDL_Rect eRect = entity.getLocation();
+	int eLeft = eRect.x;
+	int eRight = eRect.x + eRect.w;
+	int eTop = eRect.y;
+	int eBottom = eRect.y + eRect.h;
+	int overlaps = 0;
 
+	int vLeft;
+	int vRight;
+	int vTop;
+	int vBottom;
 
+	for (int i = 0; i < 41; i++)
+	{
+		overlaps = 0;
+		// CoOrdinates of entity corners
+		vLeft = voidzone[i].x;
+		vRight = voidzone[i].x + voidzone[i].w;
+		vTop = voidzone[i].y;
+		vBottom = voidzone[i].y + voidzone[i].h;
+
+		if (eLeft<vRight && eRight>vLeft && eBottom>vTop && eTop<vBottom)	//Inside on x
+		{
+			return true;
+		}
+	}
+	if (pacman)
+	{
+		overlaps = 0;
+		// CoOrdinates of entity corners
+		vLeft = voidzone[41].x;
+		vRight = voidzone[41].x + voidzone[41].w;
+		vTop = voidzone[41].y;
+		vBottom = voidzone[41].y + voidzone[41].h;
+
+		if (eLeft<vRight && eRight>vLeft && eBottom>vTop && eTop<vBottom)	//Inside on x
+		{
+			return true;
+		}
+	}
+	//Checked all void zones, no collision
+	return false;
 }
 
 void handleInput()
@@ -150,6 +196,11 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 {
 	//move pacman
 	pacman.updateLocation();
+	bool Collided = CheckCollisions(pacman, true);
+	if (Collided)
+	{
+		pacman.reverseMove();
+	}
 }
 
 void render()
@@ -164,17 +215,22 @@ void render()
 		pacman.renderSprite();
 		ghostRed.renderSprite();
 
-		//Debug - show Out of Bounds Area
-		/*
-		for (int i = 0; i < 41; i++)
+		//Only Execute if Debugging
+		if (Debug)
 		{
-			SDL_Rect plainGhostColour = fillRect(5, 0, 1, 1);
-			SDL_RenderCopy(ren, ghostRed.getSpriteSheet(), &plainGhostColour, &voidzone[i]);
+			//Debug - show Out of Bounds Area
+
+			for (int i = 0; i < 42; i++)
+			{
+				SDL_Rect plainGhostColour = fillRect(5, 0, 1, 1);
+				SDL_RenderCopy(ren, ghostRed.getSpriteSheet(), &plainGhostColour, &voidzone[i]);
+			}
+			done = true;
 		}
 
 		//Update the screen
 		SDL_RenderPresent(ren);
-		*/
+		
 }
 
 void cleanExit(int returnValue)

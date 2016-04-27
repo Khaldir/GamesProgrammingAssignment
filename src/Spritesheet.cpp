@@ -96,6 +96,8 @@ void Spritesheet::newRenderer(SDL_Renderer *ren)
 
 	location.h = widthOfSprite*2;
 	location.w = widthOfSprite*2;
+	location.x = 220;
+	location.y = 333;
 
 	renderer = ren;
 }
@@ -109,6 +111,11 @@ void Spritesheet::changeDirection(int newDirection)
 int Spritesheet::getDirection()
 {
 	return direction;
+}
+
+SDL_Rect Spritesheet::getLocation()
+{
+	return(location);
 }
 
 void Spritesheet::updateLocation()
@@ -135,5 +142,32 @@ void Spritesheet::updateLocation()
 			location.y += 1;
 			break;
 		}
+	}
+}
+
+void Spritesheet::reverseMove()
+{
+	switch (direction)
+	{
+	case 0:
+	{
+		location.x -= 1;
+		break;
+	}
+	case 1:
+	{
+		location.x += 1;
+		break;
+	}
+	case 2:
+	{
+		location.y += 1;
+		break;
+	}
+	case 3:
+	{
+		location.y -= 1;
+		break;
+	}
 	}
 }

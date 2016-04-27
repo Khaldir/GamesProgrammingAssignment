@@ -29,5 +29,7 @@ public:
 	void updateLocation();
 	void changeDirection(int newDirection);
 	int getDirection();
+	void reverseMove();
+	SDL_Rect getLocation();
 };
 
