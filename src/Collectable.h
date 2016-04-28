@@ -5,7 +5,7 @@ class Collectable
 {
 public:
 	~Collectable();
-	Collectable(std::string image, int spriteTotal, int spriteNumber);
+	Collectable();
 private:
 	int spriteNumber;
 	int spriteCount;
@@ -15,6 +15,7 @@ private:
 	SDL_Texture *sprite;
 	void CleanExit(int);
 	SDL_Renderer *renderer;
+	bool collected = false;
 public:
 	SDL_Texture * getCollectableTexture();
 	void render();
@@ -22,5 +23,7 @@ public:
 	SDL_Rect getLocation();
 	void setLocation(int x, int y);
 	void collect();
+	void fillVariables(std::string image, int spriteTotal, int spriteNum);
+	bool isCollected();
 };
 

@@ -23,6 +23,7 @@ private:
 	int prevDirection;
 	bool dead = false;
 	Uint32 deathTime;
+	bool directionChosen = false;
 public:
 	SDL_Texture * getSpriteSheet();
 	void renderSprite(SDL_Rect destinationRect);
@@ -36,6 +37,10 @@ public:
 	void reverseMove();
 	SDL_Rect getLocation();
 	void setLocation(int x, int y);
+	void setLocation(SDL_Rect newLocation);
 	void die(SDL_Renderer *ren);
+	void wallHit();
+	bool directionPicked();
+	void toggleDirectionPicked();
 };
 
